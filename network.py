@@ -6,13 +6,19 @@ def dot(v1, v2):
 def relu(value):
     return max(0, value)
 
-inputs, hidden, output = [], [], [] 
+inputs, hidden, output = [], [[]], [] 
 def create_network(nInputs, nHidden, nOutputs):
     for i in range(nInputs):
         inputs.append(Node(0, np.random.uniform(-1, 1, size=(nHidden[0],)), 0))
-
+    for i in range(len(nHidden)):
+        for j in range(nHidden[i]):
+            if i + 1 == len(nHidden):
+                hidden[i].append(Node(0, np.random.uniform(-1, 1, size=(nOutputs,)), 0.01)) # change to do kaiming initialization
+            else:
+                hidden[i].append(Node(0, np.random.uniform(-1, 1, size=(nHidden[i+1],)), 0.01))
+    for i in range(nOutputs):
+        inputs.append(Node(0, [], 0.01))
 create_network(2, [3], 2)
-print("Inputs: " + str(inputs[0]))
 
 # testing
 inputs = [Node(0, [0.2, 0.4, 0.2], 0), Node(0, [0.2, 0.4, 0.2], 0)]
