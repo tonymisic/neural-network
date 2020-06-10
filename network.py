@@ -1,29 +1,34 @@
 from node import Node
 import numpy as np
+from math import sqrt
+# globals
+inputs, hidden, output = [], [], [] 
+# hyper-parameters
+intial_bias = 0.01
+learning_rate = 0.1
+
+# dot product
 def dot(v1, v2):
     return sum([i*j for (i,j) in zip(v1,v2)])
 
+# rectified linear unit (ReLU)
 def relu(value):
     return max(0, value)
 
-inputs, hidden, output = [], [[]], [] 
+# populates network with empty nodes
 def create_network(nInputs, nHidden, nOutputs):
     for i in range(nInputs):
-        inputs.append(Node(0, np.random.uniform(-1, 1, size=(nHidden[0],)), 0))
+        inputs.append(Node(0, np.random.uniform(-1, 1, size=(nHidden[0],))*sqrt(2./nInputs), 0)) # Kaiming initialization of weights
     for i in range(len(nHidden)):
+        hidden.append([])
         for j in range(nHidden[i]):
             if i + 1 == len(nHidden):
-                hidden[i].append(Node(0, np.random.uniform(-1, 1, size=(nOutputs,)), 0.01)) # change to do kaiming initialization
+                hidden[i].append(Node(0, np.random.uniform(-1, 1, size=(nOutputs,))*sqrt(2./nHidden[i]), intial_bias)) 
             else:
-                hidden[i].append(Node(0, np.random.uniform(-1, 1, size=(nHidden[i+1],)), 0.01))
+                hidden[i].append(Node(0, np.random.uniform(-1, 1, size=(nHidden[i+1],))*sqrt(2./nHidden[i]), intial_bias))
     for i in range(nOutputs):
-        inputs.append(Node(0, [], 0.01))
-create_network(2, [3], 2)
-
-# testing
-inputs = [Node(0, [0.2, 0.4, 0.2], 0), Node(0, [0.2, 0.4, 0.2], 0)]
-hidden = [Node(0, [0.1, 0.4], 0.1), Node(0, [0.2, 0.5], 0.2), Node(0, [0.2, 0.4], 0.1)]
-output = [Node(0, [], 0.1), Node(0, [], 0.2)]
+        output.append(Node(0, [], intial_bias))
+    print("Network Created ... Architecture: Input - " + str(nInputs) + " Hidden - " + str(nHidden) + " Output - " + str(nOutputs))
 
 # performs one forward pass of the network
 def forward_pass(layers):
@@ -40,5 +45,11 @@ def forward_pass(layers):
 def back_propagate(layers, truths):
     pass
 
-forward_pass([inputs, hidden, output])
+def train(X, Y, model, epochs):
+    pass
+
+# create empty slate
+create_network(2, [2], 1)
+# one forward pass of training
+forward_pass([inputs, hidden[0], output])
 output[0].print_node()

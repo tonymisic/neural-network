@@ -1,0 +1,7 @@
+- Output layer should be a softmax activation function (not really beneficial for an XOR learning model)
+- Visualization of Weights, biases and values to affirm correction of implementation so far
+- Back-Propagation implementation
+- Training data can be handled and ran on several epochs
+- Testing implementation with a return of the error rate
+- Compartmentalize into object/class that can be used easily
+- Find suitable scalability test and show model can be learned
