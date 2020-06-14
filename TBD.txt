@@ -6,44 +6,25 @@
 - Compartmentalize into object/class that can be used easily
 - Find suitable scalability test and show model can be learned
 
-for layer in range(len(layers) - 1, 1, -1): # starting at output layer go back
-        weight_updates, bias_updates = [], []
-        if layer == len(layers) - 1: # output layer
-            node_count = 0
-            for j in layers[layer]:
-                new_value = 0
-                for k in layers[layer - 1]:
-                    new_value += k.value * k.weights[node_count]
-                bias_updates.append(sigmoid_derivative(new_value + j.bias) * costs_derivatives[0])
-                node_count = node_count + 1
-        else: # All layers but the ouput
-            node_count = 0
-            for j in layers[layer]:
-                new_value = 0
-                for k in layers[layer - 1]:
-                    new_value += k.value * k.weights[node_count]
-                delta = sigmoid_derivative(new_value + j.bias) 
-                node_count += 1
-                delta_h_b = sigmoid_derivative(dot([hidden[0][0].weights[0]], [hidden[0][0].value]) + output[0].bias) * costs_derivatives[0]
-                
-    output[0].bias += delta_h_b * learning_rate
-
-    delta_h1_w = hidden[0][0].value * sigmoid_derivative(dot([hidden[0][0].weights[0]], [hidden[0][0].value]) + output[0].bias) * costs_derivatives[0] 
-    delta_h2_w = hidden[0][1].value * sigmoid_derivative(dot([hidden[0][1].weights[0]], [hidden[0][1].value]) + output[0].bias) * costs_derivatives[0]
-    hidden[0][0].weights[0] += delta_h1_w * learning_rate
-    hidden[0][1].weights[0] += delta_h2_w * learning_rate
-
-    delta_in1_b = sigmoid_derivative(dot([inputs[0].weights[0], inputs[1].weights[0]], [inputs[0].value, inputs[1].value]) + hidden[0][0].bias) * delta_h1_w
-    delta_in2_b = sigmoid_derivative(dot([inputs[0].weights[1], inputs[1].weights[1]], [inputs[0].value, inputs[1].value]) + hidden[0][1].bias) * delta_h2_w
-    hidden[0][0].bias += delta_in1_b * learning_rate
-    hidden[0][1].bias += delta_in2_b * learning_rate
-
-    delta_in1_w1 = inputs[0].value * sigmoid_derivative(dot([inputs[0].weights[0], inputs[1].weights[0]], [inputs[0].value, inputs[1].value]) + hidden[0][0].bias) * delta_h1_w
-    delta_in1_w2 = inputs[0].value * sigmoid_derivative(dot([inputs[0].weights[1], inputs[1].weights[1]], [inputs[0].value, inputs[1].value]) + hidden[0][0].bias) * delta_h1_w
-    
-    delta_in2_w1 = inputs[1].value * sigmoid_derivative(dot([inputs[0].weights[0], inputs[1].weights[0]], [inputs[0].value, inputs[1].value]) + hidden[0][1].bias) * delta_h2_w
-    delta_in2_w2 = inputs[1].value * sigmoid_derivative(dot([inputs[0].weights[1], inputs[1].weights[1]], [inputs[0].value, inputs[1].value]) + hidden[0][1].bias) * delta_h2_w
-    inputs[0].weights[0] += delta_in1_w1 * learning_rate
-    inputs[0].weights[1] += delta_in1_w2 * learning_rate
-    inputs[1].weights[0] += delta_in2_w1 * learning_rate
-    inputs[1].weights[1] += delta_in2_w2 * learning_rate
+def back_propagate(Y):
+    loss_der = error_derivative(Y[0], activations[-1][0])
+    # calculate gradients
+    for i in reversed(range(len(weights))):
+        if i == len(weights) - 1: # output layer
+            for j in range(len(biases[i])):
+                L = len(biases[i])
+                gradient_biases[i][j] = sigmoid_derivative(dot(weights[i][j*L:j*L+L], activations[i]) + biases[i][j]) * loss_der
+            for j in range(len(weights[i])):
+                L = len(biases[i])
+                gradient_weights[i][j] = activations[i][j] * sigmoid_derivative(dot(weights[i][j*L:j*L+L], activations[i]) + biases[i][j]) * loss_der
+        else: # all other layers
+            pass
+    # update biases with learning rate
+    for i in range(len(gradient_biases)):
+        for j in range(len(gradient_biases[i])):
+            biases[i][j] += learning_rate * gradient_biases[i][j]
+    # update weights with learning rate
+    for i in range(len(gradient_weights)):
+        for j in range(len(gradient_weights[i])):
+            weights[i][j] += learning_rate * weights[i][j]
+    print(loss_der)
